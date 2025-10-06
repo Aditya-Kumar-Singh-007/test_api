@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GNews API Test</title>
+    <title>📰 GNews API Test</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -13,6 +13,7 @@
       }
       h1 {
         text-align: center;
+        color: #ffb703;
       }
       .news-container {
         display: grid;
@@ -25,6 +26,10 @@
         border-radius: 10px;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         overflow: hidden;
+        transition: transform 0.2s ease;
+      }
+      .card:hover {
+        transform: scale(1.03);
       }
       .card img {
         width: 100%;
@@ -34,10 +39,12 @@
       .card h3 {
         font-size: 18px;
         margin: 10px;
+        color: #111;
       }
       .card p {
         font-size: 14px;
         margin: 10px;
+        color: #555;
       }
       .card a {
         display: inline-block;
@@ -48,24 +55,27 @@
     </style>
   </head>
   <body>
-    <h1>📰 GNews API Test</h1>
+    <h1>📰 GNews Headlines</h1>
     <div id="news" class="news-container"></div>
 
     <script>
       const apiKey = "747caf8b8925af94d99e08f537a45a6e";
-      const country = "us"; // Define your country here
-      const category = "general"; // You can change to 'sports', 'technology', etc.
+      const lang = "en";       // language
+      const country = "us";    // country (use 'in' for India)
+      const topic = "breaking-news"; // can be 'world', 'nation', 'business', etc.
 
-      const url = `https://gnews.io/api/v4/top-headlines?country=${country}&category=${category}&apikey=${apiKey}&max=10`;
+      const url = `https://gnews.io/api/v4/top-headlines?lang=${lang}&country=${country}&topic=${topic}&max=10&apikey=${apiKey}`;
 
       async function fetchNews() {
         try {
           const response = await fetch(url);
           const data = await response.json();
           console.log(data);
-          const container = document.getElementById("news");
 
-          if (!data.articles) {
+          const container = document.getElementById("news");
+          container.innerHTML = "";
+
+          if (!data.articles || data.articles.length === 0) {
             container.innerHTML = "<p>⚠️ No articles found or API limit reached.</p>";
             return;
           }
@@ -76,13 +86,14 @@
             card.innerHTML = `
               <img src="${article.image || 'https://via.placeholder.com/300x180'}" alt="news image">
               <h3>${article.title}</h3>
-              <p>${article.description || ''}</p>
+              <p>${article.description || 'No description available.'}</p>
               <a href="${article.url}" target="_blank">Read More</a>
             `;
             container.appendChild(card);
           });
         } catch (error) {
           console.error("Error fetching news:", error);
+          document.getElementById("news").innerHTML = "<p>❌ Failed to fetch news.</p>";
         }
       }
 
